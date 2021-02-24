@@ -1,0 +1,40 @@
+# linear actuator
+startPos = 0.2190
+stepWidth = -0.0050
+nSlices = 34
+endPos = 0.0540
+userZero = 0.3342
+
+# NMR setup
+method = CPMG_Lift_v2
+coilName = 42mm Slice
+enable1D = 1
+enable3D = 0
+enableLift = 1
+magnetTargetTemperature = 0.00
+
+# NMR measurement
+measurementType = CPMG_Lift_v2
+echoTime = 0.00006000
+numEchoes = 4167
+ieTime = 1.500000
+numSteadyState = 0.000000
+numAverages = 32
+thicknessSlice = 0.005000
+gradAmpSlice = 0.164269
+sampleName = "3147_Lehm_3DF_11"
+description = ""
+txFrequency = 8967898
+excitationPulseDuration = 0.00003202
+excitationPulseAmplitude = 0.000183
+excitationPulseAngle = 90.00
+refocusingPulseDuration = 0.00001830
+refocusingPulseAmplitude = 0.000642
+refocusingPulseAngle = 180.00
+usePhaseCycle = 1
+acquisitionTime = 0.00001400
+sampleFrequency = 1000000.000
+nSamples = 14
+
+# evaluation
+phaseCorrection = 1
