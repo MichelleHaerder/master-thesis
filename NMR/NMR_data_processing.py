@@ -32,7 +32,7 @@ from FunctionsCollection import read_data, saving_in_csv, create_new_csv, PhaseC
 folderPath = "Raw_data/" 
 folderName = "3147_105_55" #adjust
 exportFolder = 'Processed_data'
-exportPath = exportFolder + '/' + folderName + '_results'
+exportPath = exportFolder + '/' + folderName + '_corrected'
 allExperiments = os.listdir(folderPath + folderName)
 folderInitials = 'NF' #or 'DF', adjust
 
