@@ -30,24 +30,30 @@ from FunctionsCollection import read_data, saving_in_csv, create_new_csv, PhaseC
 
 #select importFolder to import files and exportFolder to export results
 importFolder = "Raw_data" 
-folderName = "3147_105_55" #adjust
+folderName = "3163_105_55_3DF" #adjust
 exportFolder = 'Processed_data'
-#suffix = "_corrected"
+sampleFolder = ""
+foilFolder = ''
+h2oFolder = ''
 exportPath = os.path.join(exportFolder,folderName)
 allExperiments = os.listdir(os.path.join(importFolder,folderName))
-folderInitials = 'NF' #or 'DF', adjust
-
+folderInitials = '3DF' #or 'DF', adjust
 #create export folder in process data with name exportPath if it doesnt exist already
 if not os.path.exists(exportPath):
     os.mkdir(exportPath)
 
-folderToUse = ""
+
+
 for experiment in allExperiments:
     if folderInitials in experiment:
-        folderToUse = experiment
+        sampleFolder = experiment
+    if 'Folie'in experiment:
+        foilFolder = experiment
+    if 'H2O' in experiment:
+        h2oFolder = experiment
 
 #Take all .csv into list to analyse
-allSlicesPath = os.path.join(importFolder,folderName,folderToUse)
+allSlicesPath = os.path.join(importFolder,folderName,sampleFolder)
 allSlices = os.listdir(allSlicesPath)
 for theSlice in allSlices:
     if not ".csv" in theSlice:
@@ -55,17 +61,36 @@ for theSlice in allSlices:
 allSlices = sorted(allSlices)
 
 #read foil.csv
-foilCSVName = 'foil.csv'
-foilPath = os.path.join(importFolder,foilCSVName)
-T_foil, RV_foil, IV_foil, AV_foil = read_data(foilPath)
-Phase_foil = readPhase(foilPath, 'foil')
+foilFile = ""
+foilPath = os.path.join(importFolder,folderName,foilFolder)
+allFoils = os.listdir(foilPath)
+for theFoil in allFoils:
+    if ".csv" in theFoil:
+        foilFile = theFoil
+
+T_foil, RV_foil, IV_foil, AV_foil = read_data(os.path.join(foilPath,foilFile))
+Phase_foil = readPhase(os.path.join(foilPath,foilFile), 'foil')
 APhaseCorrected_foil = PhaseCorrection(Phase_foil, RV_foil, IV_foil)
+
+#read h20.csv
+h2oFile = ""
+h2oPath = os.path.join(importFolder,folderName,h2oFolder)
+allH2o = os.listdir(h2oPath)
+for theH2o in allH2o:
+    if ".csv" in theH2o:
+        h2oFile = theH2o
+
+T_h2o, RV_h2o, IV_h2o, AV_h2o = read_data(os.path.join(h2oPath,h2oFile))
+Phase_h2o = readPhase(os.path.join(h2oPath,h2oFile), 'h2o')
+APhaseCorrected_h2o = PhaseCorrection(Phase_h2o, RV_h2o, IV_h2o)
+data_h2o = create_new_csv(T_h2o, APhaseCorrected_h2o, os.path.join(h2oPath,h2oFile), os.path.join(exportFolder,folderName,'h2o.csv'))
+saving_in_csv(data_h2o, os.path.join(exportFolder,folderName,'h2o.csv'))
 #For loop over all slices
 for theSlice in allSlices:
 
     ###Samplefile/ Emptyfile and folder definition
     SampleName = theSlice 
-    SampleFile = os.path.join(importFolder,folderName,folderToUse,SampleName)
+    SampleFile = os.path.join(importFolder,folderName,sampleFolder,SampleName)
     T_sample, RV_sample, IV_sample, AV_sample = read_data(SampleFile)
     Phase_sample = readPhase(SampleFile, SampleName) 
 
@@ -75,12 +100,12 @@ for theSlice in allSlices:
 
     #create exporting name
     exportName = os.path.join(exportPath,SampleName)
-    print('Sample ', SampleName,': Foil subtraced and phase corrected! Exporting...\n')
+    print('Sample ', SampleName,': Foil subtraced and phase corrected! Exporting...')
         
     #%%saving
-    data_final = create_new_csv(T_sample, AFinal, SampleFile, exportName)
-    saving_in_csv(data_final, exportName)
-    print('Sample ', SampleName,':Exported to folder ',exportPath)
-
+    data_Samples = create_new_csv(T_sample, AFinal, SampleFile, exportName)
+    saving_in_csv(data_Samples, exportName)
+    print('Sample ', SampleName,':Exported to folder ',exportPath,'\n')
+    print('*****Processing next Sample*****\n')
 print("Done")
 

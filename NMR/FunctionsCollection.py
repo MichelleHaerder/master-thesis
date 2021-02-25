@@ -50,7 +50,7 @@ def PhaseCorrection(phase, RV, IV):
     """    
     Amp_sample = np.array(RV + 1j* IV)
     PhaseCorrected = Amp_sample * np.exp(-1j*float(phase))
-    print('Phase corrected!\n')
+    print('Phase corrected!')
    
     return PhaseCorrected
 
@@ -72,10 +72,10 @@ def Subtraction(File1, File2, phase, i, EmptyID):
     
     if EmptyID == True:
         
-        print('Emptyfiledata for case_'+ str(i+1)+ ' subtracted!\n')
+        print('Emptyfiledata for case_'+ str(i+1)+ ' subtracted!')
         
         Amp_final = Amp * np.exp(-1j*float(phase))
-        print('Phase corrected!\n')
+        print('Phase corrected!')
     
     else:
         Amp_final = Amp
@@ -105,6 +105,8 @@ def create_new_csv (T, Amp, sampleFile, newName):
         cw = csv.writer(matched, lineterminator = '\n')
         for i in range(3):
             cw.writerow(next(cr))
+    
+    return data_final
 
 #%%            
 def saving_in_csv (data_final, newName):    
@@ -116,5 +118,5 @@ def saving_in_csv (data_final, newName):
 
     with open(newName, 'a', newline ='')as csvfile:
         writer = csv.writer(csvfile, delimiter = '\t')
-        print(data_final)
+        #print(data_final)
         writer.writerows(data_final)
