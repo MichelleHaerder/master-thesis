@@ -15,7 +15,7 @@ what to change?
 ---------------
 
 SampleName/
-folderPath/
+importFolder/
 OutputFolder:    name of the dataset and/or folder
 
 """
@@ -28,12 +28,13 @@ from FunctionsCollection import read_data, saving_in_csv, create_new_csv, PhaseC
 # parser.add_argument("folderName", help="name of the folder containing experiment directories")
 # parser.add_argument("ExperimentKeyword",help="Mostly either 'NF' or 'DF'")
 
-#select FolderPath to import files and exportFolder to export results
-folderPath = "Raw_data/" 
+#select importFolder to import files and exportFolder to export results
+importFolder = "Raw_data" 
 folderName = "3147_105_55" #adjust
 exportFolder = 'Processed_data'
-exportPath = exportFolder + '/' + folderName + '_corrected'
-allExperiments = os.listdir(folderPath + folderName)
+#suffix = "_corrected"
+exportPath = os.path.join(exportFolder,folderName)
+allExperiments = os.listdir(os.path.join(importFolder,folderName))
 folderInitials = 'NF' #or 'DF', adjust
 
 #create export folder in process data with name exportPath if it doesnt exist already
@@ -46,41 +47,40 @@ for experiment in allExperiments:
         folderToUse = experiment
 
 #Take all .csv into list to analyse
-allSlices = os.listdir(folderPath + folderName + "/" + folderToUse)
+allSlicesPath = os.path.join(importFolder,folderName,folderToUse)
+allSlices = os.listdir(allSlicesPath)
 for theSlice in allSlices:
     if not ".csv" in theSlice:
         allSlices.remove(theSlice)
 allSlices = sorted(allSlices)
+
+#read foil.csv
+foilCSVName = 'foil.csv'
+foilPath = os.path.join(importFolder,foilCSVName)
+T_foil, RV_foil, IV_foil, AV_foil = read_data(foilPath)
+Phase_foil = readPhase(foilPath, 'foil')
+APhaseCorrected_foil = PhaseCorrection(Phase_foil, RV_foil, IV_foil)
 #For loop over all slices
 for theSlice in allSlices:
 
     ###Samplefile/ Emptyfile and folder definition
-    SampleName = theSlice
-
-    #%%reading data T = Time; RV = RealValue; IV = ImValue; AV = AbsValue 
-    SampleFile = str(folderPath) + folderName + '/' + folderToUse + '/' + SampleName 
+    SampleName = theSlice 
+    SampleFile = os.path.join(importFolder,folderName,folderToUse,SampleName)
     T_sample, RV_sample, IV_sample, AV_sample = read_data(SampleFile)
     Phase_sample = readPhase(SampleFile, SampleName) 
 
-    #%%emptyfile subtraction and/or phasecorrection
-
-    emptyFile = str(folderPath)+ 'foil.csv'
-    ###empty_001 without foil
-    ###empty_002 with foil
-    T_empty, RV_empty, IV_empty, AV_empty = read_data(emptyFile)
-    Phase_empty = readPhase(emptyFile, 'emptyfile')
-    
+    #%%foil subtraction and/or phasecorrection
     APhaseCorrected_sample = PhaseCorrection(Phase_sample, RV_sample, IV_sample)
-    APhaseCorrected_empty = PhaseCorrection(Phase_empty, RV_empty, IV_empty)
-    
-    AFinal = SubtractionNew(APhaseCorrected_sample, APhaseCorrected_empty)
-    newName = str(exportPath) +'/' + str(SampleName)+ '_corrected.csv'
+    AFinal = SubtractionNew(APhaseCorrected_sample, APhaseCorrected_foil)
 
-    APhaseCorrected_sample= PhaseCorrection(Phase_sample, RV_sample, IV_sample)
-    newName = str(exportPath) +'/' +str(SampleName)+'_corrected.csv'
-    print('Sample: Phase corrected!\n')
+    #create exporting name
+    exportName = os.path.join(exportPath,SampleName)
+    print('Sample ', SampleName,': Foil subtraced and phase corrected! Exporting...\n')
         
-#%%saving
-    data_final = create_new_csv(T_sample, AFinal, SampleFile, newName)
-    saving_in_csv(data_final, newName)
+    #%%saving
+    data_final = create_new_csv(T_sample, AFinal, SampleFile, exportName)
+    saving_in_csv(data_final, exportName)
+    print('Sample ', SampleName,':Exported to folder ',exportPath)
+
+print("Done")
 

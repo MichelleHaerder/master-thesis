@@ -105,7 +105,6 @@ def create_new_csv (T, Amp, sampleFile, newName):
         cw = csv.writer(matched, lineterminator = '\n')
         for i in range(3):
             cw.writerow(next(cr))
-    return data_final
 
 #%%            
 def saving_in_csv (data_final, newName):    
