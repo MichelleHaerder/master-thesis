@@ -26,7 +26,7 @@ def read_data(filename):
     return  time, realValue, imagValue, absValue
 
 #%%
-def readPhase(filename, samplename):
+def readPhase(filename, samplename, verbose):
     """
   
     """
@@ -38,24 +38,26 @@ def readPhase(filename, samplename):
             break
     
     phaseSample = phase_sample[0].split(' ')[3]
-    print('Sample:', samplename)
-    print('Phase:', phaseSample)
+    if verbose:
+        print('Sample:', samplename)
+        print('Phase:', phaseSample)
    
     return phaseSample
 
 #%%
-def PhaseCorrection(phase, RV, IV):
+def PhaseCorrection(phase, RV, IV, verbose):
     """
   
     """    
     Amp_sample = np.array(RV + 1j* IV)
     PhaseCorrected = Amp_sample * np.exp(-1j*float(phase))
-    print('Phase corrected!')
+    if verbose:
+        print('Phase corrected!')
    
     return PhaseCorrected
 
 #%%
-def Subtraction(File1, File2, phase, i, EmptyID):
+def Subtraction(File1, File2, phase, i, EmptyID, verbose):
     """
   
     """
@@ -71,24 +73,26 @@ def Subtraction(File1, File2, phase, i, EmptyID):
     
     
     if EmptyID == True:
-        
-        print('Emptyfiledata for case_'+ str(i+1)+ ' subtracted!')
+        if verbose:
+            print('Emptyfiledata for case_'+ str(i+1)+ ' subtracted!')
         
         Amp_final = Amp * np.exp(-1j*float(phase))
-        print('Phase corrected!')
+        if verbose:
+            print('Phase corrected!')
     
     else:
         Amp_final = Amp
-        print('Subtraction complete!')
+        if verbose:
+            print('Subtraction complete!')
    
     return Amp_final
 
 #%%
-def SubtractionNew(Amp_1, Amp_2,):
+def SubtractionNew(Amp_1, Amp_2, verbose):
 
     Amp = Amp_1 - Amp_2[0:len(Amp_1)]
-
-    print('Subtraction complete!')
+    if verbose:
+        print('Subtraction complete!')
    
     return Amp
 
@@ -118,5 +122,4 @@ def saving_in_csv (data_final, newName):
 
     with open(newName, 'a', newline ='')as csvfile:
         writer = csv.writer(csvfile, delimiter = '\t')
-        #print(data_final)
         writer.writerows(data_final)
