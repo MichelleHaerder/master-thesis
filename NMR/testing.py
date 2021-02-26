@@ -1,3 +1,7 @@
-theString = "lift_me_up"
-theString = theString.split("_")[-1]
-print(theString)
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--tsteps',action='store',nargs='?',const=1)
+args = parser.parse_args()
+print(args.tsteps)
+

@@ -121,6 +121,7 @@ def nmr_data_processing(folderName,verbose):
             print('Sample ', SampleName,': Exported to folder',exportPath,'\n')
             print('*****Processing next Sample*****\n')
     if verbose:
-        print("Data processing completed\n")
+        print("*****Data processing completed*****\n")
+        
 
 
