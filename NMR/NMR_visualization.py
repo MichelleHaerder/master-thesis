@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def nmr_visualization(folderName,plotName,figResolution,figureTitle,figureHide,figureDontSave,verbose):
+def nmr_visualization(folderName,plotName,figResolution,figureTitle,figureHide,figureDontSave,saveToFrontFolder,verbose):
     #get paths
     importFolder = "Result_data" 
     exportFolder = 'Result_data'
@@ -28,11 +28,16 @@ def nmr_visualization(folderName,plotName,figResolution,figureTitle,figureHide,f
             print('Figure will not be saved as figureDontSave is True')
     else:
         plt.savefig(os.path.join(exportPath,'plots',plotName),dpi=figResolution)
-        print('Figure saved at ' + os.path.join(exportPath,'plots',plotName), ' .')
+        if verbose:
+            print('Figure saved at ' + os.path.join(exportPath,'plots',plotName), ' .')
+        if saveToFrontFolder:
+            plt.savefig(os.path.join('Plots',plotName),dpi=figResolution)
+            if verbose:
+                print('Figure saved at ' + os.path.join('Plots',plotName), ' .')
     
     if figureHide:
         if verbose:
             print('Figure will not be shown as figureHide is True')
     else:
         plt.show()
-    
+    plt.close()

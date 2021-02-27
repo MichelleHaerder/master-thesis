@@ -1,4 +1,5 @@
 import argparse
+import os
 
 from NMR_data_processing import nmr_data_processing
 from NMR_data_evaluation import nmr_data_evaluation
@@ -9,7 +10,7 @@ def Main():
     parser = argparse.ArgumentParser(
                         description='This script phase-corrects NMR samples, evaluates water content. visualizes results and saves plots.')
     #add positional arguments
-    parser.add_argument('folderName', action='store',type=str, nargs='*',
+    parser.add_argument('-fn','--folderName', action='store',type=str, nargs='*',
                         help='any number of Name(s) of experiment folder(s). Seperated by a space, e.g. <3146_105_55_NF 3146_105_55_3DF>.')
     #add optional arguments    print(args.folderName)
     parser.add_argument('-v','--verbose',action='store_true', 
@@ -28,10 +29,23 @@ def Main():
                         help='Title for figure. Default is <H2O content Vol.%% in experiment foldername')
     parser.add_argument('-cf','--clearFolders',action='store_true',
                         help='Removes ALL content from the Result_data and Processed_data folders. Raw_data IS NOT Touched.')
+    parser.add_argument('-stff','--saveToFrontFolder',action='store_true',
+                        help='Will also save plots on NMR/Plots')
 
     #parse
     args = parser.parse_args()
-    #print(args.folderName)
+    #checking if front Plot folder exists
+    if not os.path.exists('Plots'):
+        if args.verbose:
+            print('Creating /Plots folder in NMR')
+        os.mkdir('Plots')
+    #check if folderNames is used or not to load all folders
+    if args.folderName is None:
+        if args.verbose:
+            print('No folderNames were specified. Using all folders in Raw_data...')
+        RawDataPath = 'Raw_data'
+        args.folderName = [ item for item in os.listdir(RawDataPath) if os.path.isdir(os.path.join(RawDataPath, item)) ]
+    #Clearing folder content if clearFolders is selected
     if args.clearFolders:
         if args.verbose:
             print('Clearing Content of folders Result_data and Processed_data...')
@@ -39,25 +53,23 @@ def Main():
     if args.verbose:
         print('Starting NMR experimemt evaluation with '+str(len(args.folderName))+' experiments.')
         print('List of experiments for NMR Evaluation:')
-        for fN in args.folderName:
-            print(fN)
-        print('')
+    
+    #Setting default values for args
+    if args.peakSelection is None:
+        args.peakSelection = [1, 4]
+    # if args.plotName is None:
+    #     args.plotName = fN+'_01.png'
+    if args.figureResolution is None:
+        args.figureResolution = 300
+    if args.figureHide is None:
+        args.figureHide = False
+    if args.figureDontSave is None:
+        args.figureDontSave = False
     #outer loop that iterates over all experiments
     for fN in args.folderName:
-        #Setting default values for args
-        if args.peakSelection is None:
-            args.peakSelection = [1, 4]
-        if args.plotName is None:
-            args.plotName = '_01.png'
-        if args.figureResolution is None:
-            args.figureResolution = 300
+        args.plotName = fN+'_01.png'
         if args.figureTitle is None:
             args.figureTitle = 'H2O content [Vol.%] in experiment ' + fN
-        if args.figureHide is None:
-            args.figureHide = False
-        if args.figureDontSave is None:
-            args.figureDontSave = False
-
         #run scripts with arguments from parser
         #run nmr_data_processing
         if args.verbose:
@@ -79,6 +91,7 @@ def Main():
                         args.figureTitle,
                         args.figureHide,
                         args.figureDontSave,
+                        args.saveToFrontFolder,
                         args.verbose)
 
     if args.verbose:
