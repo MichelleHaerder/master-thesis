@@ -22,12 +22,17 @@ def nmr_visualization(folderName,plotName,figResolution,figureTitle,figureHide,f
     plt.ylabel('H2O content in [Vol. %]')
     plt.xlabel('Distance from origin in [mm]')
     plt.legend()
-    if not figureHide:
-        plt.show()
-        if verbose:
-            print('Figure will not be shown as figureHide is True')
-    if not figureDontSave:
-        plt.savefig(os.path.join(exportPath,'plots',plotName),dpi=figResolution)
+    
+    if figureDontSave:
         if verbose:
             print('Figure will not be saved as figureDontSave is True')
+    else:
+        plt.savefig(os.path.join(exportPath,'plots',plotName),dpi=figResolution)
+        print('Figure saved at ' + os.path.join(exportPath,'plots',plotName), ' .')
+    
+    if figureHide:
+        if verbose:
+            print('Figure will not be shown as figureHide is True')
+    else:
+        plt.show()
     
