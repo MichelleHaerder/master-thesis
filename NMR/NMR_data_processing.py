@@ -22,8 +22,6 @@ folderName: Folder containing the slice, h2o and foil samples
                                              <folderContaining"experimentInitials">,
                                              <folderContaining"Folie">,
                                              <folderContaining"H2O">
-Optional Arguments
-
 verbose: If True prints readable info into the terminal
 
 --------------------------------
@@ -47,6 +45,7 @@ def nmr_data_processing(folderName,verbose):
     exportPath = os.path.join(exportFolder,folderName)
     allExperiments = os.listdir(os.path.join(importFolder,folderName))
     folderInitials = folderName.split("_")[-1]
+    #folderInitials= folderInitials[0]+folderInitials[1]
 
     #create export folder in process data with name exportPath if it doesnt exist already
     if not os.path.exists(exportPath):
@@ -67,7 +66,7 @@ def nmr_data_processing(folderName,verbose):
         if not ".csv" in theSlice:
             allSlices.remove(theSlice)
     allSlices = sorted(allSlices)
-
+    #print("THESLICESARE: ",allSlices)
     #read, correct and save foil.csv
     foilFile = ""
     foilPath = os.path.join(importFolder,folderName,foilFolder)
@@ -98,15 +97,18 @@ def nmr_data_processing(folderName,verbose):
 
     #For loop over all slice samples
     for theSlice in allSlices:
-
-        ###Samplefile/ Emptyfile and folder definition
+        #print("DU HURENSOHN ",theSlice)
+        ###Samsplefile/ Emptyfile and folder definition
         SampleName = theSlice 
         SampleFile = os.path.join(importFolder,folderName,sampleFolder,SampleName)
         T_sample, RV_sample, IV_sample, AV_sample = read_data(SampleFile)
         Phase_sample = readPhase(SampleFile, SampleName,verbose) 
 
         #%%foil subtraction and/or phasecorrection
+
         APhaseCorrected_sample = PhaseCorrection(Phase_sample, RV_sample, IV_sample,verbose)
+        #print("PHASECORRECTEDSAMPLE: ",APhaseCorrected_sample)
+        #print("length: ",len(APhaseCorrected_sample))
         AFinal = SubtractionNew(APhaseCorrected_sample, APhaseCorrected_foil,verbose)
 
         #create exporting name

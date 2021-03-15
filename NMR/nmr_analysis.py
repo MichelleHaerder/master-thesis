@@ -68,8 +68,8 @@ def Main():
     #outer loop that iterates over all experiments
     for fN in args.folderName:
         args.plotName = fN+'_01.png'
-        if args.figureTitle is None:
-            args.figureTitle = 'H2O content [Vol.%] in experiment ' + fN
+        #if args.figureTitle is None:
+        args.figureTitle = 'H2O content [Vol.%] in experiment ' + fN
         #run scripts with arguments from parser
         #run nmr_data_processing
         if args.verbose:

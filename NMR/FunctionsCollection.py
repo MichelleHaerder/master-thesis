@@ -89,7 +89,8 @@ def Subtraction(File1, File2, phase, i, EmptyID, verbose):
 
 #%%
 def SubtractionNew(Amp_1, Amp_2, verbose):
-
+    #print("AMP_1: ",len(Amp_1))
+    #print("AMP_2: ",len(Amp_2))
     Amp = Amp_1 - Amp_2[0:len(Amp_1)]
     if verbose:
         print('Subtraction complete!')
