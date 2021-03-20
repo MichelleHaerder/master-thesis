@@ -3,18 +3,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def nmr_visualization(folderName,plotName,figResolution,figureTitle,figureHide,figureDontSave,saveToFrontFolder,verbose):
+def nmr_visualization(folderName,
+                    experimentFolder,
+                    plotName,
+                    figResolution,
+                    figureTitle,
+                    figureHide,
+                    figureDontSave,
+                    saveToFrontFolder,
+                    verbose
+                    ):
     #get paths
     importFolder = "Result_data" 
     exportFolder = 'Result_data'
-    exportPath = os.path.join(exportFolder,folderName)
-    if not os.path.exists(os.path.join(exportPath,'plots')):
+    exportPath = os.path.join(exportFolder,folderName,"Plots")
+    if not os.path.exists(os.path.join(exportPath)):
         if verbose:
-            print('Creating folder ' + os.path.join(exportPath,'plots'))
-        os.mkdir(os.path.join(exportPath,'plots'))
+            print('Creating folder ' + exportPath)
+        os.makedirs(exportPath)
 
     fileName = 'h2o_content.csv'
-    filePath = os.path.join(importFolder,folderName,fileName)
+    filePath = os.path.join(importFolder,folderName,experimentFolder,fileName)
     #load data from 
     data = np.genfromtxt(filePath,delimiter=',')
     plt.plot(data[:,0],data[:,1],label=folderName)
@@ -27,7 +36,7 @@ def nmr_visualization(folderName,plotName,figResolution,figureTitle,figureHide,f
         if verbose:
             print('Figure will not be saved as figureDontSave is True')
     else:
-        plt.savefig(os.path.join(exportPath,'plots',plotName),dpi=figResolution)
+        plt.savefig(os.path.join(exportPath,plotName),dpi=figResolution)
         if verbose:
             print('Figure saved at ' + os.path.join(exportPath,'plots',plotName), ' .')
         if saveToFrontFolder:

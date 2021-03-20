@@ -11,7 +11,10 @@ def Main():
                         description='This script phase-corrects NMR samples, evaluates water content. visualizes results and saves plots.')
     #add positional arguments
     parser.add_argument('-fn','--folderName', action='store',type=str, nargs='*',
-                        help='any number of Name(s) of experiment folder(s). Seperated by a space, e.g. <3146_105_55_NF 3146_105_55_3DF>.')
+                        help='any number of Name(s) of experiment folder(s). Seperated by a space, e.g. <1_NF_105_55 2_3DF_55_80>.')
+    #add positional arguments
+    parser.add_argument('-ef','--experimentFolder', action='store',type=str, nargs='*',
+                        help='any number of Name(s) of experiment folder(s). Seperated by a space, e.g. <3325 3146>.')
     #add optional arguments    print(args.folderName)
     parser.add_argument('-v','--verbose',action='store_true', 
                         help= 'Outputs readable information about code to terminal on runtime.')
@@ -20,7 +23,7 @@ def Main():
     parser.add_argument('-fds','--figureDontSave',action='store_true', 
                         help='If this flag is used, the figure will not be saved.')
     parser.add_argument('-ps','--peakSelection', nargs=2,action='store',type=int, 
-                        help='choose min and max peaks to analyze. Arguments are seperated by a space. E.g. -tsteps 1 5. Default is 1 4.')
+                        help='choose min and max peaks to analyze. Arguments are seperated by a space. E.g. -tsteps 1 5. Default is 2 5. Means 2,3,4 are used.')
     parser.add_argument('-pn','--plotName',action='store',type=str, 
                         help='Choose a PlotName for your plot. Default is <folderName+_01.png>.')
     parser.add_argument('-fr','--figureResolution',action='store',type=int, 
@@ -34,17 +37,24 @@ def Main():
 
     #parse
     args = parser.parse_args()
+    
+    
     #checking if front Plot folder exists
     if not os.path.exists('Plots'):
         if args.verbose:
             print('Creating /Plots folder in NMR')
         os.mkdir('Plots')
     #check if folderNames is used or not to load all folders
+    RawDataPath = 'Raw_data'
     if args.folderName is None:
         if args.verbose:
             print('No folderNames were specified. Using all folders in Raw_data...')
-        RawDataPath = 'Raw_data'
         args.folderName = [ item for item in os.listdir(RawDataPath) if os.path.isdir(os.path.join(RawDataPath, item)) ]
+
+    #check for the error when experiment folders are specified and we dont have exactly one foldername
+    if not len(args.folderName) == 1 and args.experimentFolder is not None:
+        parser.error( "Don't get too fancy: \n --exprimentFolder can only be specified within exactly one --folderName. \n Try again...")
+        
     #Clearing folder content if clearFolders is selected
     if args.clearFolders:
         if args.verbose:
@@ -56,7 +66,7 @@ def Main():
     
     #Setting default values for args
     if args.peakSelection is None:
-        args.peakSelection = [1, 4]
+        args.peakSelection = [2,5]
     # if args.plotName is None:
     #     args.plotName = fN+'_01.png'
     if args.figureResolution is None:
@@ -66,33 +76,41 @@ def Main():
     if args.figureDontSave is None:
         args.figureDontSave = False
     #outer loop that iterates over all experiments
-    for fN in args.folderName:
-        args.plotName = fN+'_01.png'
-        #if args.figureTitle is None:
-        args.figureTitle = 'H2O content [Vol.%] in experiment ' + fN
-        #run scripts with arguments from parser
-        #run nmr_data_processing
-        if args.verbose:
-            print('Executing nmr_data_processing with foldername '+fN+'...\n')
-        nmr_data_processing(fN,args.verbose)
+    for i,fN in enumerate(args.folderName):
+        if args.experimentFolder is None or i>0:
+            fNPath = os.path.join(RawDataPath,fN)
+            if args.verbose:
+                print('No experimentFolders were specified. Using all folders in ' + args.folderName[0])
+            args.experimentFolder = [ item for item in os.listdir(fNPath) if os.path.isdir(os.path.join(fNPath, item)) ]
 
-        #run nmr_data_evaluation
-        if args.verbose:
-            print('Executing nmr_data_evaluation with foldername '+fN+'...\n')
-        nmr_data_evaluation(fN, args.verbose, args.peakSelection)
+        for eF in args.experimentFolder:
+            args.plotName = fN + "_" + eF +'.png'
+            #if args.figureTitle is None:
+            args.figureTitle = 'H2O content [Vol.%] in experiment ' + fN + "_" + eF
+            #run scripts with arguments from parser
+            #run nmr_data_processing
+            if args.verbose:
+                print('Executing nmr_data_processing with foldername ' + fN + "_" + eF + '...\n')
+            nmr_data_processing(fN,eF,args.verbose)
 
-        if args.verbose:
-            print('Executing nmr_data_evaluation with:')
-            print('plotName = ',args.plotName)
-            print('figureResolution = ',args.figureResolution)
-        nmr_visualization(fN,
-                        args.plotName,
-                        args.figureResolution,
-                        args.figureTitle,
-                        args.figureHide,
-                        args.figureDontSave,
-                        args.saveToFrontFolder,
-                        args.verbose)
+            #run nmr_data_evaluation
+            if args.verbose:
+                print('Executing nmr_data_evaluation with foldername ' + fN + "_" + eF + '...\n')
+            nmr_data_evaluation(fN, eF, args.verbose, args.peakSelection)
+
+            if args.verbose:
+                print('Executing nmr_data_evaluation with:')
+                print('plotName = ',args.plotName)
+                print('figureResolution = ',args.figureResolution)
+            nmr_visualization(fN,  
+                            eF,
+                            args.plotName,
+                            args.figureResolution,
+                            args.figureTitle,
+                            args.figureHide,
+                            args.figureDontSave,
+                            args.saveToFrontFolder,
+                            args.verbose)
 
     if args.verbose:
         print('We are done here.')

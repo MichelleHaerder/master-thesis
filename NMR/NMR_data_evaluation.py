@@ -4,12 +4,11 @@ import os
 import math
 from FunctionsCollection import read_data
 
-def nmr_data_evaluation(folderName,verbose,peakSelection):
+def nmr_data_evaluation(folderName,experimentFolder,verbose,peakSelection):
     #Define Paths for import and export
     importFolder = "Processed_data" 
-    #folderName = "3163_105_55_3DF" #adjust
     exportFolder = 'Result_data'
-    exportPath = os.path.join(exportFolder,folderName)
+    exportPath = os.path.join(exportFolder,folderName,experimentFolder)
 
     if verbose:
         print('PEAK SELECTION: '+str(peakSelection[0]+1)+'-'+str(peakSelection[1]))
@@ -18,17 +17,17 @@ def nmr_data_evaluation(folderName,verbose,peakSelection):
     if not os.path.exists(exportPath):
         if verbose:
             print('Creating folder in ',exportPath)
-        os.mkdir(exportPath)
+        os.makedirs(exportPath)
     if verbose:
         print('Calculating absValue of h2o...')
     #Should the h20 file also be corrected?
-    h20Path = os.path.join(importFolder,folderName,'h2o.csv')
+    h20Path = os.path.join(importFolder,folderName,experimentFolder,'h2o.csv')
     _,_,_,AbsValueH2o = read_data(h20Path)
     meanH2o = np.mean(AbsValueH2o[range(peakSelection[0],peakSelection[1])])
     #calculating absValue of slices
     if verbose:
         print('Calculating absValue of slices...')
-    allSlices = os.listdir(os.path.join(importFolder,folderName))
+    allSlices = os.listdir(os.path.join(importFolder,folderName,experimentFolder))
     for theSlice in allSlices:
         if not ".csv" in theSlice:
             allSlices.remove(theSlice)
@@ -39,7 +38,7 @@ def nmr_data_evaluation(folderName,verbose,peakSelection):
     allMeans = {}
     sliceThickness = 5 # in mm
     for counter, theSlice in enumerate(allSlices):
-        importPath = os.path.join(importFolder,folderName,theSlice)
+        importPath = os.path.join(importFolder,folderName,experimentFolder,theSlice)
         _,_,_,AbsValue = read_data(importPath)
         mean = np.mean(AbsValue[peakSelection])
         allMeans[theSlice] = [counter*sliceThickness, mean]
@@ -49,7 +48,6 @@ def nmr_data_evaluation(folderName,verbose,peakSelection):
             print(mean,allMeans[mean])
         print('')
 
-    fileName = folderName
     fieldNames = ['Dist from origin [mm]','mean of absValue [nT]']
 
     #******************Include the metadata in the future as header in csv
@@ -61,19 +59,19 @@ def nmr_data_evaluation(folderName,verbose,peakSelection):
     #     print (key, value)
     #******************
     if verbose:
-        print('Exporting absValues of slices as csv at '+os.path.join(exportFolder,folderName,'meanValues.csv')+'...')
+        print('Exporting absValues of slices as csv at '+os.path.join(exportFolder,folderName,experimentFolder,'meanValues.csv')+'...')
     #write absValue of samples into csv
-    with open(os.path.join(exportFolder,folderName,'meanValues.csv'),'w',newline='') as csvfile:
+    with open(os.path.join(exportFolder,folderName,experimentFolder,'meanValues.csv'),'w',newline='') as csvfile:
         writer = csv.DictWriter(csvfile,fieldnames=fieldNames)
         writer.writeheader()
         for key, value in allMeans.items():
             writer.writerow({'Dist from origin [mm]':value[0],'mean of absValue [nT]':value[1]})
 
     if verbose:
-        print('Exporting absValues of h2o as csv at '+os.path.join(exportFolder,folderName,'meanValuesH2o.csv')+'...')
+        print('Exporting absValues of h2o as csv at '+os.path.join(exportFolder,folderName,experimentFolder,'meanValuesH2o.csv')+'...')
     #write abs value of h2o into csv
     h2oDict = {'wassermessung':[0,meanH2o]}
-    with open(os.path.join(exportFolder,folderName,'meanValuesH2o.csv'),'w',newline='') as csvfile:
+    with open(os.path.join(exportFolder,folderName,experimentFolder,'meanValuesH2o.csv'),'w',newline='') as csvfile:
         writer = csv.DictWriter(csvfile,fieldnames=fieldNames)
         writer.writeheader()
         for key, value in h2oDict.items():

@@ -33,23 +33,22 @@ import numpy as np
 import os
 from FunctionsCollection import read_data, saving_in_csv, create_new_csv, PhaseCorrection, SubtractionNew, readPhase
 
-def nmr_data_processing(folderName,verbose):
+def nmr_data_processing(folderName, experimentFolder, verbose):
 
     #Define import and export folders
-    importFolder = "Raw_data" 
-    #folderName = "3163_105_55_3DF" #adjust
+    importFolder = "Raw_data"
     exportFolder = 'Processed_data'
     sampleFolder = ""
     foilFolder = ''
     h2oFolder = ''
-    exportPath = os.path.join(exportFolder,folderName)
-    allExperiments = os.listdir(os.path.join(importFolder,folderName))
-    folderInitials = folderName.split("_")[-1]
-    #folderInitials= folderInitials[0]+folderInitials[1]
+    exportPath = os.path.join(exportFolder,folderName,experimentFolder)
+    allExperiments = os.listdir(os.path.join(importFolder,folderName,experimentFolder))
+    folderInitials = folderName.split("_")[1]
 
     #create export folder in process data with name exportPath if it doesnt exist already
+
     if not os.path.exists(exportPath):
-        os.mkdir(exportPath)
+        os.makedirs(exportPath)
 
     for experiment in allExperiments:
         if folderInitials in experiment:
@@ -60,7 +59,7 @@ def nmr_data_processing(folderName,verbose):
             h2oFolder = experiment
 
     #Take all .csv into list to analyse
-    allSlicesPath = os.path.join(importFolder,folderName,sampleFolder)
+    allSlicesPath = os.path.join(importFolder,folderName,experimentFolder,sampleFolder)
     allSlices = os.listdir(allSlicesPath)
     for theSlice in allSlices:
         if not ".csv" in theSlice:
@@ -69,7 +68,7 @@ def nmr_data_processing(folderName,verbose):
     #print("THESLICESARE: ",allSlices)
     #read, correct and save foil.csv
     foilFile = ""
-    foilPath = os.path.join(importFolder,folderName,foilFolder)
+    foilPath = os.path.join(importFolder,folderName,experimentFolder,foilFolder)
     allFoils = os.listdir(foilPath)
     for theFoil in allFoils:
         if ".csv" in theFoil:
@@ -81,7 +80,7 @@ def nmr_data_processing(folderName,verbose):
 
     #read, correct and save h20.csv
     h2oFile = ""
-    h2oPath = os.path.join(importFolder,folderName,h2oFolder)
+    h2oPath = os.path.join(importFolder,folderName,experimentFolder,h2oFolder)
     allH2o = os.listdir(h2oPath)
     for theH2o in allH2o:
         if ".csv" in theH2o:
@@ -90,25 +89,22 @@ def nmr_data_processing(folderName,verbose):
     T_h2o, RV_h2o, IV_h2o, AV_h2o = read_data(os.path.join(h2oPath,h2oFile))
     Phase_h2o = readPhase(os.path.join(h2oPath,h2oFile), 'h2o',verbose)
     APhaseCorrected_h2o = PhaseCorrection(Phase_h2o, RV_h2o, IV_h2o,verbose)
-    data_h2o = create_new_csv(T_h2o, APhaseCorrected_h2o, os.path.join(h2oPath,h2oFile), os.path.join(exportFolder,folderName,'h2o.csv'))
-    saving_in_csv(data_h2o, os.path.join(exportFolder,folderName,'h2o.csv'))
+    data_h2o = create_new_csv(T_h2o, APhaseCorrected_h2o, os.path.join(h2oPath,h2oFile), os.path.join(exportFolder,folderName,experimentFolder,'h2o.csv'))
+    saving_in_csv(data_h2o, os.path.join(exportFolder,folderName,experimentFolder,'h2o.csv'))
     if verbose:
         print('H2O-Samples are corrected and saved')
 
     #For loop over all slice samples
     for theSlice in allSlices:
-        #print("DU HURENSOHN ",theSlice)
         ###Samsplefile/ Emptyfile and folder definition
         SampleName = theSlice 
-        SampleFile = os.path.join(importFolder,folderName,sampleFolder,SampleName)
+        SampleFile = os.path.join(importFolder,folderName,experimentFolder,sampleFolder,SampleName)
         T_sample, RV_sample, IV_sample, AV_sample = read_data(SampleFile)
         Phase_sample = readPhase(SampleFile, SampleName,verbose) 
 
         #%%foil subtraction and/or phasecorrection
 
         APhaseCorrected_sample = PhaseCorrection(Phase_sample, RV_sample, IV_sample,verbose)
-        #print("PHASECORRECTEDSAMPLE: ",APhaseCorrected_sample)
-        #print("length: ",len(APhaseCorrected_sample))
         AFinal = SubtractionNew(APhaseCorrected_sample, APhaseCorrected_foil,verbose)
 
         #create exporting name
