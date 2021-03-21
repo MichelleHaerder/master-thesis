@@ -1,4 +1,4 @@
-t = range(4)
-
-print(t[0])
+mylist = ['do' , 're']
+mystring = ''.join(mylist)
+print(mystring)
 

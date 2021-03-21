@@ -4,7 +4,9 @@ import os
 from NMR_data_processing import nmr_data_processing
 from NMR_data_evaluation import nmr_data_evaluation
 from NMR_visualization import nmr_visualization
+from NMR_rel_humidity import nmr_rel_humidity
 from clear import clear_folders
+
 def Main():
     #init parser
     parser = argparse.ArgumentParser(
@@ -91,8 +93,14 @@ def Main():
                 print('Executing nmr_data_evaluation with foldername ' + fN + "_" + eF + '...\n')
             nmr_data_evaluation(fN, eF, args.verbose, args.peakSelection)
 
+            #run nmr_rel_humidity
             if args.verbose:
-                print('Executing nmr_data_evaluation with:')
+                print('Executing nmr_rel_humidity with foldername ' + fN + "_" + eF + '...\n')
+            nmr_rel_humidity(fN, eF)
+
+            #run nmr_visualization
+            if args.verbose:
+                print('Executing nmr_data_visualization with:')
                 print('plotName = ',args.plotName)
                 print('figureResolution = ',args.figureResolution)
             nmr_visualization(fN,  
