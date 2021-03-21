@@ -9,6 +9,8 @@ def nmr_data_evaluation(folderName,experimentFolder,verbose,peakSelection):
     importFolder = "Processed_data" 
     exportFolder = 'Result_data'
     exportPath = os.path.join(exportFolder,folderName,experimentFolder)
+    folderInitials = folderName.split("_")[1]
+
 
     if verbose:
         print('PEAK SELECTION: '+str(peakSelection[0]+1)+'-'+str(peakSelection[1]))
@@ -40,7 +42,7 @@ def nmr_data_evaluation(folderName,experimentFolder,verbose,peakSelection):
     for counter, theSlice in enumerate(allSlices):
         importPath = os.path.join(importFolder,folderName,experimentFolder,theSlice)
         _,_,_,AbsValue = read_data(importPath)
-        mean = np.mean(AbsValue[peakSelection])
+        mean = np.mean(AbsValue[range(peakSelection[0],peakSelection[1])])
         allMeans[theSlice] = [counter*sliceThickness, mean]
     if verbose:
         print('The slices are saved in a dictionary. Here is the dictionary:\n')
@@ -112,12 +114,30 @@ def nmr_data_evaluation(folderName,experimentFolder,verbose,peakSelection):
     h2oAbsValue = np.array(h2oAbsValue)
     meanPVolH2o = h2oAbsValue / V_h2o
 
-    #compute the water content in slices [Vol %]
-    h2o_content = meansPVol / meanPVolH2o * 100
+    #compute the water content in slices [Vol.%]
+    h2o_content_vol = meansPVol / meanPVolH2o * 100
     if verbose:
-        print('List containing the h2o content of every slice:\n')
-        print(h2o_content)
+        print('List containing the h2o content in [Vol.%] of every slice:\n')
+        print(h2o_content_vol)
         print('')
-    data2export = np.column_stack((distFromOrigin,h2o_content))
-    np.savetxt(os.path.join(exportPath,'h2o_content.csv'),data2export,delimiter=',')
+    data2export = np.column_stack((distFromOrigin,h2o_content_vol))
+    np.savetxt(os.path.join(exportPath,'h2o_content_vol.csv'),data2export,delimiter=',')
 
+
+
+    #dry density for samples and water 
+    rho_sample = 0
+    if folderInitials == 'NF':
+        rho_sample= 1750 #kg/m3
+    elif folderInitials == '3DF':
+        rho_sample = 1811 #kg/m3
+    rho_h2o = 997 #kg/m3
+
+    #compute the water content in slices [M.%]
+    h2o_content_m = h2o_content_vol * rho_h2o/rho_sample
+    if verbose:
+        print('List containing the h2o content in [M.%] of every slice:\n')
+        print(h2o_content_m)
+        print('')
+    data2export = np.column_stack((distFromOrigin,h2o_content_m))
+    np.savetxt(os.path.join(exportPath,'h2o_content_m.csv'),data2export,delimiter=',')

@@ -24,12 +24,8 @@ def Main():
                         help='If this flag is used, the figure will not be saved.')
     parser.add_argument('-ps','--peakSelection', nargs=2,action='store',type=int, 
                         help='choose min and max peaks to analyze. Arguments are seperated by a space. E.g. -tsteps 1 5. Default is 2 5. Means 2,3,4 are used.')
-    parser.add_argument('-pn','--plotName',action='store',type=str, 
-                        help='Choose a PlotName for your plot. Default is <folderName+_01.png>.')
     parser.add_argument('-fr','--figureResolution',action='store',type=int, 
                         help='Resolution chosen for plot. Default is 300 dpi. Note that if not specified the figure will be overwritten.')
-    parser.add_argument('-ft','--figureTitle',action='store',type=str, 
-                        help='Title for figure. Default is <H2O content Vol.%% in experiment foldername')
     parser.add_argument('-cf','--clearFolders',action='store_true',
                         help='Removes ALL content from the Result_data and Processed_data folders. Raw_data IS NOT Touched.')
     parser.add_argument('-stff','--saveToFrontFolder',action='store_true',
@@ -84,9 +80,6 @@ def Main():
             args.experimentFolder = [ item for item in os.listdir(fNPath) if os.path.isdir(os.path.join(fNPath, item)) ]
 
         for eF in args.experimentFolder:
-            args.plotName = fN + "_" + eF +'.png'
-            #if args.figureTitle is None:
-            args.figureTitle = 'H2O content [Vol.%] in experiment ' + fN + "_" + eF
             #run scripts with arguments from parser
             #run nmr_data_processing
             if args.verbose:
@@ -104,9 +97,7 @@ def Main():
                 print('figureResolution = ',args.figureResolution)
             nmr_visualization(fN,  
                             eF,
-                            args.plotName,
                             args.figureResolution,
-                            args.figureTitle,
                             args.figureHide,
                             args.figureDontSave,
                             args.saveToFrontFolder,
