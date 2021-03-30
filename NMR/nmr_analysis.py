@@ -79,9 +79,11 @@ def Main():
             fNPath = os.path.join(RawDataPath,fN)
             if args.verbose:
                 print('No experimentFolders were specified. Using all folders in ' + args.folderName[0])
-            args.experimentFolder = [ item for item in os.listdir(fNPath) if os.path.isdir(os.path.join(fNPath, item)) ]
+            args.experimentFolder = [ item for item in os.listdir(fNPath) 
+                                    if (os.path.isdir(os.path.join(fNPath, item)) and not item == "Plots")]
+            args.experimentFolder = sorted(args.experimentFolder)
 
-        for eF in args.experimentFolder:
+        for counter,eF in enumerate(args.experimentFolder):
             #run scripts with arguments from parser
             #run nmr_data_processing
             if args.verbose:
@@ -96,7 +98,7 @@ def Main():
             #run nmr_rel_humidity
             if args.verbose:
                 print('Executing nmr_rel_humidity with foldername ' + fN + "_" + eF + '...\n')
-            nmr_rel_humidity(fN, eF)
+            nmr_rel_humidity(fN, eF, counter)
 
             #run nmr_visualization
             if args.verbose:

@@ -1,7 +1,7 @@
 import numpy as np
 import os
 
-def nmr_rel_humidity(folderName, experimentFolder):
+def nmr_rel_humidity(folderName, experimentFolder, counter):
 
     #get paths
     importFolder = 'Sorptionsisotherme'
@@ -21,17 +21,23 @@ def nmr_rel_humidity(folderName, experimentFolder):
     data = np.genfromtxt(importPath, delimiter=';', skip_header=1)
     dataIncreasing = data[0:20]
     dataDecreasing = data[19:]
+    #Flipping data to be of ascending order so that np.interp() works properly.
+    dataDecreasing = np.flip(dataDecreasing,axis=0)
+
     folderInitials2 = folderName.split("_")[2]
     folderInitials3 = folderName.split("_")[3]
-    activeData = []
-    if int(folderInitials2) < int(folderInitials3):
+    
+    if counter == 1:
         activeData = dataIncreasing
     else:
-        activeData = dataDecreasing
+        if int(folderInitials2) < int(folderInitials3):
+            activeData = dataIncreasing
+        else:
+            activeData = dataDecreasing
 
     #get M.% data 
     h2o_content_m = np.genfromtxt(importPathH2o, delimiter=',', skip_header=0)
-    distFromOrigin = h2o_content_m[:,0]s
+    distFromOrigin = h2o_content_m[:,0]
     h2o_content_m = h2o_content_m[:,1]
 
     #interpolate relative humidity from Sorptionsisotherme

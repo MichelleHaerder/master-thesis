@@ -35,11 +35,11 @@ def nmr_visualization(folderName,
 
         #load data from 
         data = np.genfromtxt(filePath,delimiter=',')
-        plt.plot(data[:,0],data[:,1],label=folderName, linestyle='dashed')
-        plt.scatter(data[:,0],data[:,1])
+        plt.plot(data[:,0],data[:,1],label=folderName, linestyle='dashed', linewidth= 0.2, marker= ".")
+        plt.scatter(data[:,0],data[:,1],s=0.5)
         plt.title(figureTitle)
-        plt.ylabel('H2O content in {}'.format(titleList[i]))
-        plt.xlabel('Distance from origin in [mm]')
+        plt.ylabel('Wassergehalt {}'.format(titleList[i]))
+        plt.xlabel('Probenlänge [mm]')
         plt.legend()
 
         if figureDontSave:
@@ -64,45 +64,45 @@ def nmr_visualization(folderName,
 
     #plot with mm, M.% and rel humidity
     #get data from
-    fileName = 'rel_humidity.csv'
-    filePath = os.path.join(importFolder,folderName,experimentFolder,fileName)
-    data = np.genfromtxt(filePath,delimiter=',')
+    #fileName = 'rel_humidity.csv'
+    #filePath = os.path.join(importFolder,folderName,experimentFolder,fileName)
+    #data = np.genfromtxt(filePath,delimiter=',')
 
-    fig, ax1 = plt.subplots()
-    ax2 = ax1.twinx()
+    #fig, ax1 = plt.subplots()
+    #ax2 = ax1.twinx()
 
-    ax1.set_xlabel("Distance from origin in [mm]")
-    ax1.set_ylabel("H2O content in [M.%]")
-    ax1.plot(data[:,0],data[:,1],linewidth= 0.2, linestyle= "dashed")
-    ax1.scatter(data[:,0],data[:,1],marker="x")
+    #ax1.set_xlabel("Distance from origin in [mm]")
+    #ax1.set_ylabel("H2O content in [M.%]")
+    #ax1.plot(data[:,0],data[:,1],linewidth= 0.2, linestyle= "dashed")
+    #ax1.scatter(data[:,0],data[:,1],marker="x")
     #figureTitle = 'H2O content and relative humidity in experiment ' + folderName + "_" + experimentFolder
     #ax1.title[figureTitle]
 
-    ax2.set_ylabel("Relative Humidity in [%]")
-    ax2.plot(data[:,0],data[:,2], alpha=0)
+    #ax2.set_ylabel("Relative Humidity in [%]")
+    #ax2.plot(data[:,0],data[:,2], alpha=1)
 
-    fig.tight_layout()
+    #fig.tight_layout()
 
     #save plots
-    plotName = folderName + "_" + experimentFolder + '_rel_humidity.png'
-    if figureDontSave:
-        if verbose:
-            print('Figure will not be saved as figureDontSave is True')
-    else:
-        plt.savefig(os.path.join(exportPath,plotName),dpi=figResolution)
-        if verbose:
-            print('Figure saved at ' + os.path.join(exportPath,'plots',plotName), ' .')
+    #plotName = folderName + "_" + experimentFolder + '_rel_humidity.png'
+    #if figureDontSave:
+        #if verbose:
+            #print('Figure will not be saved as figureDontSave is True')
+    #else:
+        #plt.savefig(os.path.join(exportPath,plotName),dpi=figResolution)
+        #if verbose:
+            #print('Figure saved at ' + os.path.join(exportPath,'plots',plotName), ' .')
 
-    if saveToFrontFolder:
-        plt.savefig(os.path.join('Plots',plotName),dpi=figResolution)
-        if verbose:
-            print('Figure saved at ' + os.path.join('Plots',plotName), ' .')
+    #if saveToFrontFolder:
+        #plt.savefig(os.path.join('Plots',plotName),dpi=figResolution)
+        #if verbose:
+            #print('Figure saved at ' + os.path.join('Plots',plotName), ' .')
 
-    if figureHide:
-        if verbose:
-            print('Figure will not be shown as figureHide is True')
-    else:
-        plt.show()
-    plt.close()
+    #if figureHide:
+        #if verbose:
+            #print('Figure will not be shown as figureHide is True')
+    #else:
+        #plt.show()
+    #plt.close()
 
         
