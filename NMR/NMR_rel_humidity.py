@@ -12,7 +12,7 @@ def nmr_rel_humidity(folderName, experimentFolder, counter):
     else:
         fileName = 'Sorptionsisotherme_3DF.csv'
         importPath = os.path.join(importFolder,fileName)
-    importFolderH2o = 'Result_data'
+    importFolderH2o = 'Result_data/indi_result'
     importFileH2o = 'h2o_content_m.csv'
     importPathH2o = os.path.join(importFolderH2o,folderName,experimentFolder,importFileH2o)
     exportPath = os.path.join(importFolderH2o,folderName,experimentFolder)

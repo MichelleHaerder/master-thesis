@@ -1,14 +1,11 @@
 """
 Created on Fri Apr  5 13:57:42 2019
 @author: snagel1
-
 Adaption on Fri Feb 25 10:00:00 2021
 @adapted: MichelleHaerder
           Github Repository: https://github.com/MichelleHaerder/master-thesis
-
 nmr_data_processing: Function for NMR Phase Correction of Slice Samples
 --------------------------------
-
 This function reads plural NMR T2 measurement slice files as csv-files.
 It reads the foil measurements and subtracts its phase-corrected values from the slice samples.
 Also, it phase-corrects the h2o sample file
@@ -16,17 +13,14 @@ The phase-corrected slice samples are saved as csv files with raw-data header.
  
 --------------------------------
 Positional Arguments
-
 folderName: Folder containing the slice, h2o and foil samples
             Structure of this folder must be <folderName> -->
                                              <folderContaining"experimentInitials">,
                                              <folderContaining"Folie">,
                                              <folderContaining"H2O">
 verbose: If True prints readable info into the terminal
-
 --------------------------------
 Future work to do:
-
 """
 
 import numpy as np
@@ -121,5 +115,3 @@ def nmr_data_processing(folderName, experimentFolder, verbose):
     if verbose:
         print("*****Data processing completed*****\n")
         
-
-

@@ -14,8 +14,8 @@ def nmr_visualization(folderName,
 
 
     #get paths
-    importFolder = "Result_data" 
-    exportFolder = 'Result_data'
+    importFolder = "Result_data/indi_result" 
+    exportFolder = 'Result_data/indi_result'
     exportPath = os.path.join(exportFolder,folderName,"Plots")
     if not os.path.exists(os.path.join(exportPath)):
         if verbose:

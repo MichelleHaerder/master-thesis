@@ -7,7 +7,7 @@ from FunctionsCollection import read_data
 def nmr_data_evaluation(folderName,experimentFolder,verbose,peakSelection):
     #Define Paths for import and export
     importFolder = "Processed_data" 
-    exportFolder = 'Result_data'
+    exportFolder = 'Result_data/indi_result'
     exportPath = os.path.join(exportFolder,folderName,experimentFolder)
     folderInitials = folderName.split("_")[1]
 

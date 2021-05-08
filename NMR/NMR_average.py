@@ -9,9 +9,8 @@ pp = pprint.PrettyPrinter(indent=4)
 verbose = True
 
 # Paths
-importPath = 'Result_data'
-exportFolder = '_avg_result'
-exportPath = os.path.join(importPath,exportFolder)
+importPath = 'Result_data/indi_result'
+exportPath = 'Result_data/avg_result'
 # Create _avg_result folder
 if not os.path.exists(os.path.join(exportPath)):
         if verbose:
@@ -44,7 +43,7 @@ currentData = []
 distFromOrigin = []
 for key in d: 
     nTimeSeries = len([item for item in os.listdir(os.path.join(importPath,d[key][0])) if not item=='Plots'])
-    for timeSeries in range(4):
+    for timeSeries in range(10):
         
         for i,currentElement in enumerate(d[key]):
             currentElementChildren = sorted([item for item in os.listdir(os.path.join(importPath,currentElement)) if not item=='Plots'])
