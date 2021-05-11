@@ -4,42 +4,34 @@ import time
 
 class FeuchteModell():
     def __init__(self):
-        self.increasing = True
         self.delta_pw = 6.579*10**-11
         self.delta_pd = None
-        self.rho_material = 1833
+        self.D_w = 8.029*10**-11
+        self.rho_material = 1750
         self.rho_w = 1.000
-        self.dx = 0.005
+        self.dx = 0.1
         self.dt = 600
-        self.x = 0.15
+        self.x = 1.15
         self.t = 36000
         self.T = 23
         self.nSlices = int(self.x/self.dx)
-        self.phi = []
-        self.w_f = (109.60291049, 108.87296769) #(wf_ad, wf_de)
-        self.b = (1.55379379, 2.4556701)  #correction factor (b_ad, b_de)
-        self.A = 0.0247126 # [kg/m²sqrt(s)]
-        
+        self.p_sat = self._calc_p_sat()
+        self.F = self._calc_F()
 
     def initial_and_boundary_conditions(self):
         #later we can change the conditions
         self.phi_initial = 0.5
         self.phi_boundary = 0.9
     
-    def make_tri_diag(self,phi):
-        """
-        Create the tridiagonal matrix to solve one timestep. The tridiagonal matrix represents the gradient in space.
-        """
-        a_w, a_p, a_e = self._make_tridiag_coeff(phi)
-        triDiag = self._tridiag(a_w,a_p,a_e)
+    def make_tri_diag(self):
+        a = c = -self.F*np.ones(self.nSlices-1)
+        b = (1 + 2*self.F)*np.ones(self.nSlices)
+        triDiag = self._tridiag(a,b,c)
 
         return triDiag
-    
-    def test_tridiag(self):
-        phi = 0.6 * np.ones(self.nSlices)
-        tridiag = self.make_tri_diag(phi)
-        print(tridiag)
-    #********************************************************************************
+
+
+
     #extensions/helper functions
     def _calc_p_sat(self):
         """
@@ -49,80 +41,22 @@ class FeuchteModell():
 
         return p_sat
 
-    def _tridiag(self,a_w, a_p, a_e, k1=-1, k2=0, k3=1):
+    def _calc_F(self):
+        """
+        Returns key parameter.
+        """
+        F = self.dt/self.dx**2*(self.D_w*self.rho_w + self.delta_pw*self.p_sat)
+
+        return F
+
+    def _tridiag(self,a, b, c, k1=-1, k2=0, k3=1):
         """
         Returns a tridiagonal matrix with:
-        a_p as main diagonal,
-        a_w as lower diagonal,
-        a_e as upper diagonal
+        b as main diagonal,
+        a as lower diagonal,
+        c as upper diagonal
         """
-        return np.diag(a_w, k1) + np.diag(a_p, k2) + np.diag(a_e, k3)
-
-    def _make_tridiag_coeff(self,phi):
-        """
-        Returns the coefficients for the tridiagonal matrix. They are dependent on the last/current phi.
-        Mind that we had a wrong sign in our calculation and we took the signs from Künzel et. al.
-        """
-        phi_w = phi[1:]
-        phi_p = phi
-        phi_e = phi[:-1]
-        a_w = self._calc_D_phi(phi_w) * (1/self.dx) - self._calc_p_sat() * self.delta_pw * (1/self.dx)
-        a_p = -self._calc_D_phi(phi_p) * (1/self.dx) - self._calc_p_sat() * self.delta_pw * (1/self.dx) - self._derivative_dw_dphi(phi_p) * (self.dx/self.dt)
-        a_e = self._calc_D_phi(phi_e) * (1/self.dx) - self._calc_p_sat() * self.delta_pw * (1/self.dx)
-        
-
-        return a_w, a_p, a_e
-
-    def _rf_to_h2o_content(self,phi):
-        """
-        Maps relative humidity [-] to water content in [kg/m³] using the curve fitting described in Künzel et. al.
-        correction factor: b_ad = 1.55379379, b_de = 2.4556701
-        free water saturation: w_f,ad = 109.60291049, w_f,de = 108.87296769
-        """
-        if self.increasing:
-            w = self.w_f[0]*(self.b[0]-1)*np.array(phi)/(self.b[0]-np.array(phi))
-        else:
-            w = self.w_f[1]*(self.b[1]-1)*np.array(phi)/(self.b[1]-np.array(phi))
-
-        return w
-    
-    def _derivative_dw_dphi(self,phi):
-        """
-        Derivative of "Feuchtespeicherfunktion" [kg/m³].
-        Returns the gradient for dw/dphi at given phi.
-        """
-        if self.increasing:
-            dw_dphi = self.w_f[0]*((self.b[0]-1) * (self.b[0]-phi) + (self.b[0]-1)*phi) / (self.b[0]-phi)**2
-        else:
-            dw_dphi = self.w_f[1]*((self.b[1]-1) * (self.b[1]-phi) + (self.b[1]-1)*phi) / (self.b[1]-phi)**2
-
-        return dw_dphi
-
-
-    def _calc_D_ws(self,w):
-        """
-        Calculate "Kapillartransportkoeffizient für den Saugvorgang" [m²/s]
-        Needs water content of last/current step.
-        """
-        if self.increasing:
-            D_ws = 3.8 * (self.A / self.w_f[0])**2 * 1000**(w/(self.w_f[0]-1)) 
-        else:
-            D_ws = 3.8 * (self.A / self.w_f[1])**2 * 1000**(w/(self.w_f[1]-1)) 
-
-        return D_ws
-
-    def _calc_D_phi(self,phi):
-        """
-        Calculate "Flüssigleitkoeffzient" D_phi = D_w * dw/dphi [kg/ms]
-        """
-        w = self._rf_to_h2o_content(phi)
-        D_ws = self._calc_D_ws(w)
-        D_phi = D_ws * self._derivative_dw_dphi(phi)
-
-        return D_phi
-
-
-
+        return np.diag(a, k1) + np.diag(b, k2) + np.diag(c, k3)
 
 # if __name__ == "__main__":
 
