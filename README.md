@@ -37,12 +37,12 @@ Keep in mind that modifying the folder structure requires making changes in the 
 avg_plots require calling other scripts (t.b.d)
 3D plots require calling other scripts (t.b.d.)
 
-###Feuchtemodell
+### Feuchtemodell
 t.b.d.
 
 ## Results
 
-Insert some avg resiöts
+Insert some avg results
 
 
 
