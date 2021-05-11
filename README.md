@@ -21,16 +21,16 @@ The code is based only on Python and Anaconda was used to create a virtua enviro
 Raw data is taken in as `.csv` and need to be placed in a folder named *Raw_data*. If the folder does not exist, please create one.
 
 The folder structure inside *Raw_data* is:
-* >folder, e.g. "3_3DF_55_80", which corresponds to *<sampleNr_clayType_initHumidity_finalHumidity>*
-  * >folder e.g. "3271", which corresponds to *<testNr>*
-    * > folder "Experiment...Lehm_3DF", which contains the nmr slice samples.
-      * > one `.csv` per slice
-    * > folder "Experiment...Folie", which contains a nmr measurement of the foil.
-      * > one `.csv` for the foil
-    * > folder "Experiment...H2O", which contains a nmr measurement of water.
-      * > one `.csv` for the foil
-    * > folder "Experiment...Lehm_leer", t.b.d.
-      * > one `.csv` t.b.d.
+* folder, e.g. "3_3DF_55_80", which corresponds to *<sampleNr_clayType_initHumidity_finalHumidity>*
+  * folder e.g. "3271", which corresponds to *<testNr>*
+    * folder "Experiment...Lehm_3DF", which contains the nmr slice samples.
+      * one `.csv` per slice
+    * folder "Experiment...Folie", which contains a nmr measurement of the foil.
+      * one `.csv` for the foil
+    * folder "Experiment...H2O", which contains a nmr measurement of water.
+      * one `.csv` for the foil
+    * folder "Experiment...Lehm_leer", t.b.d.
+      * one `.csv` t.b.d.
 
 Keep in mind that modifying the folder structure requires making changes in the code.
 
